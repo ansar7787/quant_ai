@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
                   backgroundColor: Colors.green,
                 ),
               );
-              // context.go('/home'); // TODO: Create Home Route
+              context.go('/home');
             }
           },
           builder: (context, state) {

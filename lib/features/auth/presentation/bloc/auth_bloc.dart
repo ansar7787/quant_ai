@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:injectable/injectable.dart';
-import 'package:quant_ai/core/usecase/usecase.dart';
+
 import 'package:quant_ai/features/auth/domain/entities/user.dart';
 import 'package:quant_ai/features/auth/domain/usecases/login_usecase.dart';
 
