@@ -36,7 +36,7 @@ class QuantAiApp extends StatelessWidget {
           themeMode: ThemeMode.system,
 
           // 🚦 Routing
-          routerConfig: AppRouter.router,
+          routerConfig: getIt<AppRouter>().router,
         );
       },
     );
