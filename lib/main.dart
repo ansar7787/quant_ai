@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quant_ai/config/routes/app_router.dart';
 import 'package:quant_ai/config/theme/app_theme.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:quant_ai/config/env.dart';
 import 'package:quant_ai/di/injection.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(url: Env.supabaseUrl, anonKey: Env.supabaseAnonKey);
+
   configureDependencies();
   runApp(const QuantAiApp());
 }
