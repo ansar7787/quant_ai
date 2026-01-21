@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quant_ai/features/market/presentation/pages/market_page.dart';
+import 'package:quant_ai/features/portfolio/presentation/pages/portfolio_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,7 +14,7 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _pages = [
     const MarketPage(),
-    const Center(child: Text("Portfolio Page (Coming Soon)")),
+    const PortfolioPage(),
     const Center(child: Text("AI Chat (Coming Soon)")),
   ];
 
