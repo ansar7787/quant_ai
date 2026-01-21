@@ -27,3 +27,11 @@ class PortfolioTransactionAdded extends PortfolioEvent {
   @override
   List<Object> get props => [symbol, name, image, amount, price];
 }
+
+class PortfolioBalanceUpdated extends PortfolioEvent {
+  final double amount;
+  const PortfolioBalanceUpdated(this.amount);
+
+  @override
+  List<Object> get props => [amount];
+}

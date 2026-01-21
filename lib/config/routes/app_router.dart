@@ -5,6 +5,8 @@ import 'package:quant_ai/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:quant_ai/features/auth/presentation/pages/login_page.dart';
 import 'package:quant_ai/features/auth/presentation/pages/sign_up_page.dart';
 import 'package:quant_ai/features/home/presentation/pages/home_page.dart';
+import 'package:quant_ai/features/market/domain/entities/coin.dart';
+import 'package:quant_ai/features/market/presentation/pages/coin_detail_page.dart';
 
 @lazySingleton
 class AppRouter {
@@ -19,6 +21,13 @@ class AppRouter {
       GoRoute(path: '/', builder: (context, state) => const LoginPage()),
       GoRoute(path: '/signup', builder: (context, state) => const SignUpPage()),
       GoRoute(path: '/home', builder: (context, state) => const HomePage()),
+      GoRoute(
+        path: '/coin',
+        builder: (context, state) {
+          final coin = state.extra as Coin;
+          return CoinDetailPage(coin: coin);
+        },
+      ),
     ],
     redirect: (context, state) {
       final authState = _authBloc.state;

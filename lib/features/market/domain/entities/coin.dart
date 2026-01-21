@@ -7,6 +7,7 @@ class Coin extends Equatable {
   final double currentPrice;
   final double priceChange24h;
   final double marketCap;
+  final int marketCapRank;
   final String image;
 
   const Coin({
@@ -16,6 +17,7 @@ class Coin extends Equatable {
     required this.currentPrice,
     required this.priceChange24h,
     required this.marketCap,
+    required this.marketCapRank,
     required this.image,
   });
 
@@ -27,6 +29,7 @@ class Coin extends Equatable {
     currentPrice,
     priceChange24h,
     marketCap,
+    marketCapRank,
     image,
   ];
 }

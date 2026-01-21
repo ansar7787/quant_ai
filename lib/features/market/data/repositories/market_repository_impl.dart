@@ -13,10 +13,48 @@ class MarketRepositoryImpl implements MarketRepository {
   MarketRepositoryImpl(this._service);
 
   @override
-  Future<Either<Failure, List<Coin>>> getMarketCoins() async {
+  Future<Either<Failure, List<Coin>>> getMarketCoins({int page = 1}) async {
     try {
-      final coins = await _service.getCoins();
-      return Right(coins); // CoinModel extends Coin, so this works
+      final coins = await _service.getCoins(page: page);
+      return Right(coins);
+    } on DioException catch (e) {
+      return Left(ServerFailure(e.message ?? 'Network Error'));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Coin>>> getTrendingCoins() async {
+    try {
+      final response = await _service.getTrending();
+      final coins = response.coins.map((e) => e.item.toDomain()).toList();
+      return Right(coins);
+    } on DioException catch (e) {
+      return Left(ServerFailure(e.message ?? 'Network Error'));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Coin>>> getCoinsByIds(List<String> ids) async {
+    if (ids.isEmpty) return const Right([]);
+    try {
+      final coins = await _service.getCoins(ids: ids.join(','));
+      return Right(coins);
+    } on DioException catch (e) {
+      return Left(ServerFailure(e.message ?? 'Network Error'));
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<double>>> getCoinChart(String id) async {
+    try {
+      final response = await _service.getCoinMarketChart(id);
+      return Right(response.pricePoints);
     } on DioException catch (e) {
       return Left(ServerFailure(e.message ?? 'Network Error'));
     } catch (e) {

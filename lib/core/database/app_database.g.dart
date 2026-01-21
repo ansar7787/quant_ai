@@ -363,15 +363,267 @@ class PortfolioTableCompanion extends UpdateCompanion<PortfolioTableData> {
   }
 }
 
+class $WalletTableTable extends WalletTable
+    with TableInfo<$WalletTableTable, WalletTableData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $WalletTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _balanceMeta = const VerificationMeta(
+    'balance',
+  );
+  @override
+  late final GeneratedColumn<double> balance = GeneratedColumn<double>(
+    'balance',
+    aliasedName,
+    false,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0.0),
+  );
+  static const VerificationMeta _currencyMeta = const VerificationMeta(
+    'currency',
+  );
+  @override
+  late final GeneratedColumn<String> currency = GeneratedColumn<String>(
+    'currency',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('USD'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, balance, currency];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'wallet_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<WalletTableData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('balance')) {
+      context.handle(
+        _balanceMeta,
+        balance.isAcceptableOrUnknown(data['balance']!, _balanceMeta),
+      );
+    }
+    if (data.containsKey('currency')) {
+      context.handle(
+        _currencyMeta,
+        currency.isAcceptableOrUnknown(data['currency']!, _currencyMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  WalletTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return WalletTableData(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      balance: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}balance'],
+      )!,
+      currency: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}currency'],
+      )!,
+    );
+  }
+
+  @override
+  $WalletTableTable createAlias(String alias) {
+    return $WalletTableTable(attachedDatabase, alias);
+  }
+}
+
+class WalletTableData extends DataClass implements Insertable<WalletTableData> {
+  final int id;
+  final double balance;
+  final String currency;
+  const WalletTableData({
+    required this.id,
+    required this.balance,
+    required this.currency,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['balance'] = Variable<double>(balance);
+    map['currency'] = Variable<String>(currency);
+    return map;
+  }
+
+  WalletTableCompanion toCompanion(bool nullToAbsent) {
+    return WalletTableCompanion(
+      id: Value(id),
+      balance: Value(balance),
+      currency: Value(currency),
+    );
+  }
+
+  factory WalletTableData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return WalletTableData(
+      id: serializer.fromJson<int>(json['id']),
+      balance: serializer.fromJson<double>(json['balance']),
+      currency: serializer.fromJson<String>(json['currency']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'balance': serializer.toJson<double>(balance),
+      'currency': serializer.toJson<String>(currency),
+    };
+  }
+
+  WalletTableData copyWith({int? id, double? balance, String? currency}) =>
+      WalletTableData(
+        id: id ?? this.id,
+        balance: balance ?? this.balance,
+        currency: currency ?? this.currency,
+      );
+  WalletTableData copyWithCompanion(WalletTableCompanion data) {
+    return WalletTableData(
+      id: data.id.present ? data.id.value : this.id,
+      balance: data.balance.present ? data.balance.value : this.balance,
+      currency: data.currency.present ? data.currency.value : this.currency,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WalletTableData(')
+          ..write('id: $id, ')
+          ..write('balance: $balance, ')
+          ..write('currency: $currency')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, balance, currency);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is WalletTableData &&
+          other.id == this.id &&
+          other.balance == this.balance &&
+          other.currency == this.currency);
+}
+
+class WalletTableCompanion extends UpdateCompanion<WalletTableData> {
+  final Value<int> id;
+  final Value<double> balance;
+  final Value<String> currency;
+  const WalletTableCompanion({
+    this.id = const Value.absent(),
+    this.balance = const Value.absent(),
+    this.currency = const Value.absent(),
+  });
+  WalletTableCompanion.insert({
+    this.id = const Value.absent(),
+    this.balance = const Value.absent(),
+    this.currency = const Value.absent(),
+  });
+  static Insertable<WalletTableData> custom({
+    Expression<int>? id,
+    Expression<double>? balance,
+    Expression<String>? currency,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (balance != null) 'balance': balance,
+      if (currency != null) 'currency': currency,
+    });
+  }
+
+  WalletTableCompanion copyWith({
+    Value<int>? id,
+    Value<double>? balance,
+    Value<String>? currency,
+  }) {
+    return WalletTableCompanion(
+      id: id ?? this.id,
+      balance: balance ?? this.balance,
+      currency: currency ?? this.currency,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (balance.present) {
+      map['balance'] = Variable<double>(balance.value);
+    }
+    if (currency.present) {
+      map['currency'] = Variable<String>(currency.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('WalletTableCompanion(')
+          ..write('id: $id, ')
+          ..write('balance: $balance, ')
+          ..write('currency: $currency')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $PortfolioTableTable portfolioTable = $PortfolioTableTable(this);
+  late final $WalletTableTable walletTable = $WalletTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [portfolioTable];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    portfolioTable,
+    walletTable,
+  ];
 }
 
 typedef $$PortfolioTableTableCreateCompanionBuilder =
@@ -580,10 +832,168 @@ typedef $$PortfolioTableTableProcessedTableManager =
       PortfolioTableData,
       PrefetchHooks Function()
     >;
+typedef $$WalletTableTableCreateCompanionBuilder =
+    WalletTableCompanion Function({
+      Value<int> id,
+      Value<double> balance,
+      Value<String> currency,
+    });
+typedef $$WalletTableTableUpdateCompanionBuilder =
+    WalletTableCompanion Function({
+      Value<int> id,
+      Value<double> balance,
+      Value<String> currency,
+    });
+
+class $$WalletTableTableFilterComposer
+    extends Composer<_$AppDatabase, $WalletTableTable> {
+  $$WalletTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get balance => $composableBuilder(
+    column: $table.balance,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currency => $composableBuilder(
+    column: $table.currency,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$WalletTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $WalletTableTable> {
+  $$WalletTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get balance => $composableBuilder(
+    column: $table.balance,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get currency => $composableBuilder(
+    column: $table.currency,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$WalletTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $WalletTableTable> {
+  $$WalletTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<double> get balance =>
+      $composableBuilder(column: $table.balance, builder: (column) => column);
+
+  GeneratedColumn<String> get currency =>
+      $composableBuilder(column: $table.currency, builder: (column) => column);
+}
+
+class $$WalletTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $WalletTableTable,
+          WalletTableData,
+          $$WalletTableTableFilterComposer,
+          $$WalletTableTableOrderingComposer,
+          $$WalletTableTableAnnotationComposer,
+          $$WalletTableTableCreateCompanionBuilder,
+          $$WalletTableTableUpdateCompanionBuilder,
+          (
+            WalletTableData,
+            BaseReferences<_$AppDatabase, $WalletTableTable, WalletTableData>,
+          ),
+          WalletTableData,
+          PrefetchHooks Function()
+        > {
+  $$WalletTableTableTableManager(_$AppDatabase db, $WalletTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$WalletTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$WalletTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$WalletTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<double> balance = const Value.absent(),
+                Value<String> currency = const Value.absent(),
+              }) => WalletTableCompanion(
+                id: id,
+                balance: balance,
+                currency: currency,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<double> balance = const Value.absent(),
+                Value<String> currency = const Value.absent(),
+              }) => WalletTableCompanion.insert(
+                id: id,
+                balance: balance,
+                currency: currency,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$WalletTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $WalletTableTable,
+      WalletTableData,
+      $$WalletTableTableFilterComposer,
+      $$WalletTableTableOrderingComposer,
+      $$WalletTableTableAnnotationComposer,
+      $$WalletTableTableCreateCompanionBuilder,
+      $$WalletTableTableUpdateCompanionBuilder,
+      (
+        WalletTableData,
+        BaseReferences<_$AppDatabase, $WalletTableTable, WalletTableData>,
+      ),
+      WalletTableData,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
   $$PortfolioTableTableTableManager get portfolioTable =>
       $$PortfolioTableTableTableManager(_db, _db.portfolioTable);
+  $$WalletTableTableTableManager get walletTable =>
+      $$WalletTableTableTableManager(_db, _db.walletTable);
 }

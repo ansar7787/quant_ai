@@ -11,4 +11,6 @@ abstract class PortfolioRepository {
     required double amount,
     required double price,
   });
+  Future<Either<Failure, double>> getWalletBalance();
+  Future<Either<Failure, void>> updateBalance(double amount);
 }

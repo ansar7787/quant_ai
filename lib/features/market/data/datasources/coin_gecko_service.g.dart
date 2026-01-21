@@ -27,6 +27,7 @@ class _CoinGeckoService implements CoinGeckoService {
     String order = 'market_cap_desc',
     int perPage = 50,
     int page = 1,
+    String? ids,
     bool sparkline = false,
   }) async {
     final _extra = <String, dynamic>{};
@@ -35,8 +36,10 @@ class _CoinGeckoService implements CoinGeckoService {
       r'order': order,
       r'per_page': perPage,
       r'page': page,
+      r'ids': ids,
       r'sparkline': sparkline,
     };
+    queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;
     final _options = _setStreamType<List<CoinModel>>(
@@ -55,6 +58,67 @@ class _CoinGeckoService implements CoinGeckoService {
       _value = _result.data!
           .map((dynamic i) => CoinModel.fromJson(i as Map<String, dynamic>))
           .toList();
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<TrendingResponseModel> getTrending() async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<TrendingResponseModel>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/search/trending',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late TrendingResponseModel _value;
+    try {
+      _value = TrendingResponseModel.fromJson(_result.data!);
+    } on Object catch (e, s) {
+      errorLogger?.logError(e, s, _options, response: _result);
+      rethrow;
+    }
+    return _value;
+  }
+
+  @override
+  Future<MarketChartResponseModel> getCoinMarketChart(
+    String id, {
+    String vsCurrency = 'usd',
+    String days = '1',
+  }) async {
+    final _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{
+      r'vs_currency': vsCurrency,
+      r'days': days,
+    };
+    final _headers = <String, dynamic>{};
+    const Map<String, dynamic>? _data = null;
+    final _options = _setStreamType<MarketChartResponseModel>(
+      Options(method: 'GET', headers: _headers, extra: _extra)
+          .compose(
+            _dio.options,
+            '/coins/${id}/market_chart',
+            queryParameters: queryParameters,
+            data: _data,
+          )
+          .copyWith(baseUrl: _combineBaseUrls(_dio.options.baseUrl, baseUrl)),
+    );
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+    late MarketChartResponseModel _value;
+    try {
+      _value = MarketChartResponseModel.fromJson(_result.data!);
     } on Object catch (e, s) {
       errorLogger?.logError(e, s, _options, response: _result);
       rethrow;

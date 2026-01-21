@@ -13,11 +13,19 @@ class MarketLoading extends MarketState {}
 
 class MarketLoaded extends MarketState {
   final List<Coin> coins;
+  final List<Coin> trendingCoins;
 
-  const MarketLoaded(this.coins);
+  const MarketLoaded(this.coins, {this.trendingCoins = const []});
 
   @override
-  List<Object> get props => [coins];
+  List<Object> get props => [coins, trendingCoins];
+
+  MarketLoaded copyWith({List<Coin>? coins, List<Coin>? trendingCoins}) {
+    return MarketLoaded(
+      coins ?? this.coins,
+      trendingCoins: trendingCoins ?? this.trendingCoins,
+    );
+  }
 }
 
 class MarketError extends MarketState {

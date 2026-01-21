@@ -46,4 +46,24 @@ class PortfolioRepositoryImpl implements PortfolioRepository {
       return Left(CacheFailure('Failed to add transaction'));
     }
   }
+
+  @override
+  Future<Either<Failure, double>> getWalletBalance() async {
+    try {
+      final balance = await _db.getWalletBalance();
+      return Right(balance);
+    } catch (e) {
+      return Left(CacheFailure('Failed to load wallet balance'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateBalance(double amount) async {
+    try {
+      await _db.updateBalance(amount);
+      return const Right(null);
+    } catch (e) {
+      return Left(CacheFailure('Failed to update balance'));
+    }
+  }
 }

@@ -18,6 +18,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +57,8 @@ class _SignUpPageState extends State<SignUpPage> {
           },
           builder: (context, state) {
             return Stack(
+              clipBehavior: Clip.none,
+              fit: StackFit.expand,
               children: [
                 // Background Elements
                 Positioned(
@@ -66,8 +70,18 @@ class _SignUpPageState extends State<SignUpPage> {
                         height: 250,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: theme.colorScheme.secondary.withOpacity(0.1),
-                          blurRadius: 100,
+                          color: theme.colorScheme.secondary.withValues(
+                            alpha: 0.1,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: theme.colorScheme.secondary.withValues(
+                                alpha: 0.2,
+                              ),
+                              blurRadius: 100,
+                              spreadRadius: 20,
+                            ),
+                          ],
                         ),
                       ).animate().scale(
                         duration: 3.seconds,
@@ -76,109 +90,153 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
 
                 SafeArea(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          SizedBox(height: 20.h),
-                          Text(
-                            'Create Account',
-                            style: theme.textTheme.headlineMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ).animate().fadeIn().slideX(begin: -0.1),
-
-                          SizedBox(height: 8.h),
-
-                          Text(
-                            'Join the future of intelligent finance.',
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              color: Colors.grey,
-                            ),
-                          ).animate().fadeIn(delay: 200.ms),
-
-                          SizedBox(height: 40.h),
-
-                          _buildTextField(
-                            controller: _emailController,
-                            label: 'Email Address',
-                            icon: Icons.email_rounded,
-                            theme: theme,
-                          ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1),
-
-                          SizedBox(height: 16.h),
-
-                          _buildTextField(
-                            controller: _passwordController,
-                            label: 'Password',
-                            icon: Icons.lock_rounded,
-                            isPassword: true,
-                            theme: theme,
-                          ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1),
-
-                          SizedBox(height: 16.h),
-
-                          _buildTextField(
-                            controller: _confirmPasswordController,
-                            label: 'Confirm Password',
-                            icon: Icons.lock_outline_rounded,
-                            isPassword: true,
-                            theme: theme,
-                            validator: (value) {
-                              if (value != _passwordController.text) {
-                                return 'Passwords do not match';
-                              }
-                              return null;
-                            },
-                          ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.1),
-
-                          SizedBox(height: 40.h),
-
-                          SizedBox(
-                            height: 56.h,
-                            child: FilledButton(
-                              onPressed: state is AuthLoading
-                                  ? null
-                                  : () {
-                                      if (_formKey.currentState?.validate() ??
-                                          false) {
-                                        context.read<AuthBloc>().add(
-                                          AuthRegisterRequested(
-                                            email: _emailController.text,
-                                            password: _passwordController.text,
-                                          ),
-                                        );
-                                      }
-                                    },
-                              style: FilledButton.styleFrom(
-                                backgroundColor: theme.primaryColor,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16.r),
-                                ),
-                                elevation: 4,
-                                shadowColor: theme.primaryColor.withOpacity(
-                                  0.4,
-                                ),
+                  child: GestureDetector(
+                    onTap: () => FocusScope.of(context).unfocus(),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.symmetric(horizontal: 24.w),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            SizedBox(height: 20.h),
+                            Text(
+                              'Create Account',
+                              style: theme.textTheme.headlineMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
                               ),
-                              child: state is AuthLoading
-                                  ? const CircularProgressIndicator.adaptive(
-                                      backgroundColor: Colors.white,
-                                    )
-                                  : Text(
-                                      'Sign Up',
-                                      style: TextStyle(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                            ),
-                          ).animate().fadeIn(delay: 800.ms).scale(),
+                            ).animate().fadeIn().slideX(begin: -0.1),
 
-                          SizedBox(height: 24.h),
-                        ],
+                            SizedBox(height: 8.h),
+
+                            Text(
+                              'Join the future of intelligent finance.',
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: Colors.grey,
+                              ),
+                            ).animate().fadeIn(delay: 200.ms),
+
+                            SizedBox(height: 40.h),
+
+                            _buildTextField(
+                                  controller: _emailController,
+                                  label: 'Email Address',
+                                  icon: Icons.email_rounded,
+                                  theme: theme,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Required';
+                                    }
+                                    if (!value.contains('@')) {
+                                      return 'Invalid email';
+                                    }
+                                    return null;
+                                  },
+                                )
+                                .animate()
+                                .fadeIn(delay: 400.ms)
+                                .slideY(begin: 0.1),
+
+                            SizedBox(height: 16.h),
+
+                            _buildTextField(
+                                  controller: _passwordController,
+                                  label: 'Password',
+                                  icon: Icons.lock_rounded,
+                                  isPassword: true,
+                                  isPasswordVisible: _isPasswordVisible,
+                                  onSuffixIconPressed: () {
+                                    setState(() {
+                                      _isPasswordVisible = !_isPasswordVisible;
+                                    });
+                                  },
+                                  theme: theme,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Required';
+                                    }
+                                    if (value.length < 6) {
+                                      return 'Min 6 characters';
+                                    }
+                                    return null;
+                                  },
+                                )
+                                .animate()
+                                .fadeIn(delay: 500.ms)
+                                .slideY(begin: 0.1),
+
+                            SizedBox(height: 16.h),
+
+                            _buildTextField(
+                                  controller: _confirmPasswordController,
+                                  label: 'Confirm Password',
+                                  icon: Icons.lock_outline_rounded,
+                                  isPassword: true,
+                                  isPasswordVisible: _isConfirmPasswordVisible,
+                                  onSuffixIconPressed: () {
+                                    setState(() {
+                                      _isConfirmPasswordVisible =
+                                          !_isConfirmPasswordVisible;
+                                    });
+                                  },
+                                  theme: theme,
+                                  validator: (value) {
+                                    if (value != _passwordController.text) {
+                                      return 'Passwords do not match';
+                                    }
+                                    return null;
+                                  },
+                                )
+                                .animate()
+                                .fadeIn(delay: 600.ms)
+                                .slideY(begin: 0.1),
+
+                            SizedBox(height: 40.h),
+
+                            SizedBox(
+                              height: 56.h,
+                              child: FilledButton(
+                                onPressed: state is AuthLoading
+                                    ? null
+                                    : () {
+                                        if (_formKey.currentState?.validate() ??
+                                            false) {
+                                          context.read<AuthBloc>().add(
+                                            AuthRegisterRequested(
+                                              email: _emailController.text,
+                                              password:
+                                                  _passwordController.text,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: theme.primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16.r),
+                                  ),
+                                  elevation: 4,
+                                  shadowColor: theme.primaryColor.withValues(
+                                    alpha: 0.4,
+                                  ),
+                                ),
+                                child: state is AuthLoading
+                                    ? const CircularProgressIndicator.adaptive(
+                                        backgroundColor: Colors.white,
+                                      )
+                                    : Text(
+                                        'Sign Up',
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                              ),
+                            ).animate().fadeIn(delay: 800.ms).scale(),
+
+                            SizedBox(height: 24.h),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -196,6 +254,8 @@ class _SignUpPageState extends State<SignUpPage> {
     required String label,
     required IconData icon,
     bool isPassword = false,
+    bool isPasswordVisible = false,
+    VoidCallback? onSuffixIconPressed,
     required ThemeData theme,
     String? Function(String?)? validator,
   }) {
@@ -205,7 +265,7 @@ class _SignUpPageState extends State<SignUpPage> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -213,12 +273,26 @@ class _SignUpPageState extends State<SignUpPage> {
       ),
       child: TextFormField(
         controller: controller,
-        obscureText: isPassword,
+        obscureText: isPassword && !isPasswordVisible,
         style: const TextStyle(fontWeight: FontWeight.w500),
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(color: Colors.grey[600]),
-          prefixIcon: Icon(icon, color: theme.primaryColor.withOpacity(0.7)),
+          prefixIcon: Icon(
+            icon,
+            color: theme.primaryColor.withValues(alpha: 0.7),
+          ),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    isPasswordVisible
+                        ? Icons.visibility_rounded
+                        : Icons.visibility_off_rounded,
+                    color: Colors.grey,
+                  ),
+                  onPressed: onSuffixIconPressed,
+                )
+              : null,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16.r),
             borderSide: BorderSide.none,

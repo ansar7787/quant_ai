@@ -5,19 +5,46 @@ part 'coin_model.g.dart';
 
 @JsonSerializable()
 class CoinModel extends Coin {
+  @override
+  final String id;
+  @override
+  final String symbol;
+  @override
+  final String name;
+  @override
+  @JsonKey(name: 'current_price')
+  final double currentPrice;
+  @override
   @JsonKey(name: 'price_change_percentage_24h')
-  final double priceChangePercentage24h;
+  final double priceChange24h;
+  @override
+  @JsonKey(name: 'market_cap')
+  final double marketCap;
+  @override
+  @JsonKey(name: 'market_cap_rank')
+  final int marketCapRank;
+  @override
+  final String image;
 
   const CoinModel({
-    required super.id,
-    required super.symbol,
-    required super.name,
-    @JsonKey(name: 'current_price') required super.currentPrice,
-    @JsonKey(name: 'price_change_percentage_24h')
-    required this.priceChangePercentage24h,
-    @JsonKey(name: 'market_cap') required super.marketCap,
-    required super.image,
-  }) : super(priceChange24h: priceChangePercentage24h);
+    required this.id,
+    required this.symbol,
+    required this.name,
+    required this.currentPrice,
+    required this.priceChange24h,
+    required this.marketCap,
+    required this.marketCapRank,
+    required this.image,
+  }) : super(
+         id: id,
+         symbol: symbol,
+         name: name,
+         currentPrice: currentPrice,
+         marketCap: marketCap,
+         marketCapRank: marketCapRank,
+         image: image,
+         priceChange24h: priceChange24h,
+       );
 
   factory CoinModel.fromJson(Map<String, dynamic> json) =>
       _$CoinModelFromJson(json);

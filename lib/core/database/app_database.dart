@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:injectable/injectable.dart';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
@@ -19,13 +19,57 @@ class PortfolioTable extends Table {
   Set<Column> get primaryKey => {symbol};
 }
 
-@lazySingleton
-@DriftDatabase(tables: [PortfolioTable])
+class WalletTable extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  RealColumn get balance => real().withDefault(const Constant(0.0))();
+  TextColumn get currency => text().withDefault(const Constant('USD'))();
+}
+
+@DriftDatabase(tables: [PortfolioTable, WalletTable])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  // Migration logic
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    onCreate: (m) async {
+      await m.createAll();
+      // Initialize wallet with 0 balance
+      await into(
+        walletTable,
+      ).insert(WalletTableCompanion.insert(balance: const Value(0.0)));
+    },
+    onUpgrade: (m, from, to) async {
+      if (from < 2) {
+        await m.createTable(walletTable);
+        await into(
+          walletTable,
+        ).insert(WalletTableCompanion.insert(balance: const Value(0.0)));
+      }
+    },
+  );
+
+  Future<double> getWalletBalance() async {
+    final wallet = await select(walletTable).getSingleOrNull();
+    return wallet?.balance ?? 0.0;
+  }
+
+  Future<void> updateBalance(double amount) async {
+    final currentBalance = await getWalletBalance();
+    final newBalance = currentBalance + amount;
+
+    final wallet = await select(walletTable).getSingleOrNull();
+    if (wallet != null) {
+      await update(walletTable).replace(wallet.copyWith(balance: newBalance));
+    } else {
+      await into(
+        walletTable,
+      ).insert(WalletTableCompanion.insert(balance: Value(newBalance)));
+    }
+  }
 
   Future<List<PortfolioTableData>> getAllAssets() =>
       select(portfolioTable).get();

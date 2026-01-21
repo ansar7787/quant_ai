@@ -67,4 +67,7 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(ServerFailure(e.message));
     }
   }
+
+  @override
+  Stream<User?> get authStateChanges => remoteDataSource.authStateChanges;
 }

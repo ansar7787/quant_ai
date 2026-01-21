@@ -5,6 +5,7 @@ import 'package:injectable/injectable.dart';
 import 'package:quant_ai/features/auth/domain/entities/user.dart';
 import 'package:quant_ai/features/auth/domain/usecases/login_usecase.dart'; // Restore Import
 import 'package:quant_ai/features/auth/domain/usecases/register_usecase.dart';
+import 'package:quant_ai/features/auth/domain/usecases/get_auth_stream_usecase.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -13,11 +14,34 @@ part 'auth_state.dart';
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginUseCase _loginUseCase;
   final RegisterUseCase _registerUseCase;
+  final GetAuthStateStreamUseCase _getAuthStateStreamUseCase;
 
-  AuthBloc(this._loginUseCase, this._registerUseCase) : super(AuthInitial()) {
+  AuthBloc(
+    this._loginUseCase,
+    this._registerUseCase,
+    this._getAuthStateStreamUseCase,
+  ) : super(AuthInitial()) {
+    on<AuthSubscriptionRequested>(_onSubscriptionRequested);
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
-    // TODO: Implement AuthCheckRequested and AuthLogoutRequested
+
+    add(AuthSubscriptionRequested());
+  }
+
+  Future<void> _onSubscriptionRequested(
+    AuthSubscriptionRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    await emit.forEach<User?>(
+      _getAuthStateStreamUseCase(),
+      onData: (user) {
+        if (user != null) {
+          return AuthAuthenticated(user);
+        }
+        return AuthInitial();
+      },
+      onError: (_, __) => const AuthFailure('Authentication state error'),
+    );
   }
 
   Future<void> _onLoginRequested(

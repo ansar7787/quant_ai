@@ -11,6 +11,7 @@ abstract class AuthRemoteDataSource {
   );
   Future<void> logout();
   Future<domain.User?> getCurrentUser();
+  Stream<domain.User?> get authStateChanges;
 }
 
 @LazySingleton(as: AuthRemoteDataSource)
@@ -51,6 +52,7 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
       final response = await _supabaseClient.auth.signUp(
         email: email,
         password: password,
+        emailRedirectTo: 'io.supabase.quantai://login-callback',
       );
 
       if (response.user == null) {
@@ -95,5 +97,13 @@ class SupabaseAuthRemoteDataSource implements AuthRemoteDataSource {
       displayName: user.userMetadata?['display_name'],
       photoUrl: user.userMetadata?['avatar_url'],
     );
+  }
+
+  @override
+  Stream<domain.User?> get authStateChanges {
+    return _supabaseClient.auth.onAuthStateChange.map((data) {
+      final user = data.session?.user;
+      return user != null ? _mapSupabaseUserToDomain(user) : null;
+    });
   }
 }
